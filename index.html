@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Resizer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+html, body { height: 100%; margin: 0; }
+body { background: #08080c; color: #e8e6e3; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+.drop-zone { border: 2px dashed #23232e; border-radius: 12px; transition: all 0.3s; cursor: pointer; }
+.drop-zone:hover { border-color: #d4943a; background: rgba(212,148,58,0.02); }
+.resize-card { background: #111118; border: 1px solid #23232e; border-radius: 12px; padding: 16px; }
+.size-input { background: #0e0e14; border: 1px solid #23232e; border-radius: 8px; padding: 8px; color: #e8e6e3; font-family: 'JetBrains Mono', monospace; font-size: 16px; width: 100%; text-align: center; }
+.size-input:focus { outline: none; border-color: #d4943a; }
+.btn-primary { background: linear-gradient(135deg, #d4943a, #c07820); color: #0a0a0f; font-weight: 700; border: none; border-radius: 8px; padding: 10px; cursor: pointer; transition: 0.3s; width: 100%; font-size: 14px; }
+.btn-primary:hover { box-shadow: 0 4px 15px rgba(212,148,58,0.25); }
+.btn-secondary { background: #111118; color: #e8e6e3; border: 1px solid #23232e; border-radius: 8px; padding: 8px 16px; cursor: pointer; transition: 0.3s; font-size: 14px; }
+.btn-secondary:hover { border-color: #d4943a; }
+</style>
+</head>
+<body>
+
+<div class="max-w-4xl mx-auto w-full flex-grow flex flex-col p-4 md:p-6">
+    <!-- Header -->
+    <header class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #f0b960, #d4943a);">
+            <i class="fa-solid fa-screwdriver-wrench text-base" style="color: #0a0a0f;"></i>
+        </div>
+        <div>
+            <h1 class="text-lg font-bold leading-tight">Image Resizer</h1>
+            <p class="text-xs" style="color: #6b6878;">Resize & convert images to PNG locally</p>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="text-center mb-4">
+        <h2 class="text-2xl md:text-3xl font-black tracking-tight mb-2">
+            Resize images <span style="color: #d4943a;">individually</span>
+        </h2>
+        <p class="text-sm mb-3" style="color: #6b6878;">Drop images, set custom sizes, and download them as PNG.</p>
+        <a href="https://github.com/chris1111/Image-Resizer" target="_blank" class="btn-secondary inline-flex items-center gap-2 text-xs">
+            <i class="fa-brands fa-github"></i> View on Github
+        </a>
+    </section>
+
+    <!-- Drop Zone -->
+    <div id="dropZone" class="drop-zone p-6 text-center mb-4">
+        <i class="fa-solid fa-cloud-arrow-up text-xl mb-2" style="color: #d4943a;"></i>
+        <p class="font-bold text-base mb-1">Drop your images here</p>
+        <p class="text-xs mb-3" style="color: #6b6878;">or click to browse — PNG, JPEG, WebP supported</p>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md" style="background: rgba(212,148,58,0.08); border: 1px solid rgba(212,148,58,0.15);">
+            <span class="text-xs font-bold mono" style="color: #f0b960;">OUTPUT FORMAT: PNG</span>
+        </div>
+    </div>
+    <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp" multiple class="hidden">
+
+    <!-- Controls -->
+    <div id="controls" class="text-center mb-4 hidden">
+        <p class="text-sm font-semibold mb-2"><span id="imgCount">0</span> Images Loaded</p>
+        <button id="clearBtn" class="btn-secondary text-xs">
+            <i class="fa-solid fa-xmark mr-1"></i> Clear All
+        </button>
+    </div>
+
+    <!-- Grid -->
+    <div id="resizeGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4"></div>
+
+    <!-- Pushes remaining elements to the bottom -->
+    <div class="flex-grow"></div>
+
+    <!-- How it works -->
+    <section class="mb-4">
+        <div class="rounded-xl p-4" style="background: #111118; border: 1px solid #23232e;">
+            <h3 class="text-sm font-bold mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-microchip text-xs" style="color: #d4943a;"></i>
+                How this works
+            </h3>
+            <div class="grid md:grid-cols-3 gap-4 text-xs" style="color: #6b6878;">
+                <div>
+                    <p class="font-semibold mb-1" style="color: #e8e6e3;">Individual Control</p>
+                    <p>Each image gets its own card. Set completely different dimensions for every image.</p>
+                </div>
+                <div>
+                    <p class="font-semibold mb-1" style="color: #e8e6e3;">Aspect Ratio Lock</p>
+                    <p>Change the width, and the height auto-updates to maintain the original shape.</p>
+                </div>
+                <div>
+                    <p class="font-semibold mb-1" style="color: #e8e6e3;">100% Private</p>
+                    <p>Like the macOS <span class="mono" style="color: #f0b960;">sips</span> command, all rendering is local.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Footer -->
+<footer class="text-center p-4" style="color: #6b6878;">
+    <p class="text-xs mb-1">All processing happens locally in your browser. No data is uploaded.</p>
+    <p class="text-xs">Copyright © 2025 chris1111, All Right Reserved.</p>
+</footer>
+
+<div id="toast" class="fixed top-4 right-4 hidden bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm"></div>
+
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const resizeGrid = document.getElementById('resizeGrid');
+const controls = document.getElementById('controls');
+const imgCount = document.getElementById('imgCount');
+const clearBtn = document.getElementById('clearBtn');
+const toast = document.getElementById('toast');
+let images = [];
+
+function showToast(msg, isErr = false) {
+    toast.textContent = msg;
+    toast.className = `fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 text-sm ${isErr ? 'bg-red-500' : 'bg-green-500'} text-white`;
+    setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = '#d4943a'; });
+dropZone.addEventListener('dragleave', () => dropZone.style.borderColor = '#23232e');
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.style.borderColor = '#23232e'; handleFiles(e.dataTransfer.files); });
+fileInput.addEventListener('change', e => handleFiles(e.target.files));
+clearBtn.addEventListener('click', clearAll);
+
+function handleFiles(files) {
+    const valid = Array.from(files).filter(f => ['image/png', 'image/jpeg', 'image/webp'].includes(f.type));
+    if (valid.length === 0) return showToast('Please select valid PNG, JPEG, or WebP files.', true);
+    
+    valid.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                images.push({ img, file, name: file.name, w: img.naturalWidth, h: img.naturalHeight });
+                renderGrid();
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function renderGrid() {
+    const isEmpty = images.length === 0;
+    controls.classList.toggle('hidden', isEmpty);
+    imgCount.textContent = images.length;
+    resizeGrid.innerHTML = '';
+    
+    images.forEach((item, i) => {
+        const card = document.createElement('div');
+        card.className = 'resize-card';
+        card.innerHTML = `
+            <div class="flex items-center gap-3 mb-3">
+                <img src="${item.img.src}" class="w-10 h-10 object-cover rounded-md">
+                <div class="flex-1 overflow-hidden">
+                    <p class="font-bold text-sm truncate">${item.name}</p>
+                    <p class="text-xs mono" style="color: #6b6878;">Original: ${item.w} x ${item.h}</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="text-xs mono block mb-1" style="color: #6b6878;">WIDTH (px)</label>
+                    <input type="number" class="size-input w-input" value="${item.w}" min="1">
+                </div>
+                <div>
+                    <label class="text-xs mono block mb-1" style="color: #6b6878;">HEIGHT (px)</label>
+                    <input type="number" class="size-input h-input" value="${item.h}" min="1">
+                </div>
+            </div>
+            <button class="btn-primary resize-btn" data-index="${i}">
+                <i class="fa-solid fa-download mr-2"></i> Resize & Download (PNG)
+            </button>
+        `;
+        resizeGrid.appendChild(card);
+    });
+
+    document.querySelectorAll('.resize-btn').forEach(btn => {
+        btn.addEventListener('click', e => resizeImage(parseInt(e.currentTarget.dataset.index)));
+    });
+}
+
+function resizeImage(index) {
+    const item = images[index];
+    const card = resizeGrid.children[index];
+    const w = parseInt(card.querySelector('.w-input').value);
+    const h = parseInt(card.querySelector('.h-input').value);
+    
+    if (!w || !h || w <= 0 || h <= 0) return showToast('Invalid dimensions.', true);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(item.img, 0, 0, w, h);
+
+    canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${item.name.split('.').slice(0, -1).join('.')}-${w}x${h}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Downloaded successfully!');
+    }, 'image/png');
+}
+
+function clearAll() {
+    images = [];
+    renderGrid();
+}
+</script>
+</body>
+</html>
