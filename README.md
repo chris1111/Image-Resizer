@@ -4,7 +4,12 @@
 
 ## Start using ➢ [Image-Resizer](https://chris1111.github.io/Image-Resizer/)
 
+### Combined with this tools ➥ [Icon-Studio](https://chris1111.github.io/Icon-Studio/) 
+they are the perfect tools for creating themes icons for OpenCore or Clover.
 
+----------------------------------------------------------------------------
+
+### How it work
 1. Local & Private (Browser-side)
 Everything happens directly inside your web browser using the HTML5 Canvas API. Just like the macOS sips command runs in your terminal, this tool runs in your browser engine. No images are ever uploaded to a server, ensuring 100% privacy.
 
