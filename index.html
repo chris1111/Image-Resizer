@@ -3,109 +3,373 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Image Resizer</title>
+<title>Image Resizer — Cosmic Edition</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-html, body { height: 100%; margin: 0; }
-body { background: #08080c; color: #e8e6e3; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column; }
-.mono { font-family: 'JetBrains Mono', monospace; }
-.drop-zone { border: 2px dashed #23232e; border-radius: 12px; transition: all 0.3s; cursor: pointer; }
-.drop-zone:hover { border-color: #d4943a; background: rgba(212,148,58,0.02); }
-.resize-card { background: #111118; border: 1px solid #23232e; border-radius: 12px; padding: 16px; }
-.size-input { background: #0e0e14; border: 1px solid #23232e; border-radius: 8px; padding: 8px; color: #e8e6e3; font-family: 'JetBrains Mono', monospace; font-size: 16px; width: 100%; text-align: center; }
-.size-input:focus { outline: none; border-color: #d4943a; }
-.btn-primary { background: linear-gradient(135deg, #d4943a, #c07820); color: #0a0a0f; font-weight: 700; border: none; border-radius: 8px; padding: 10px; cursor: pointer; transition: 0.3s; width: 100%; font-size: 14px; }
-.btn-primary:hover { box-shadow: 0 4px 15px rgba(212,148,58,0.25); }
-.btn-secondary { background: #111118; color: #e8e6e3; border: 1px solid #23232e; border-radius: 8px; padding: 8px 16px; cursor: pointer; transition: 0.3s; font-size: 14px; }
-.btn-secondary:hover { border-color: #d4943a; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: #05050a;
+    color: #e8e6e3;
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ====== Galaxy background layers ====== */
+  #galaxyCanvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .nebula {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.45;
+    pointer-events: none;
+    z-index: 0;
+    animation: drift 30s ease-in-out infinite alternate;
+  }
+  .nebula-1 {
+    width: 520px; height: 520px;
+    top: -120px; left: -100px;
+    background: radial-gradient(circle, rgba(212,148,58,0.55), transparent 65%);
+  }
+  .nebula-2 {
+    width: 600px; height: 600px;
+    bottom: -180px; right: -120px;
+    background: radial-gradient(circle, rgba(120,80,200,0.45), transparent 65%);
+    animation-delay: -10s;
+  }
+  .nebula-3 {
+    width: 440px; height: 440px;
+    top: 40%; left: 55%;
+    background: radial-gradient(circle, rgba(60,130,220,0.35), transparent 65%);
+    animation-delay: -18s;
+  }
+  @keyframes drift {
+    0%   { transform: translate(0,0) scale(1); }
+    100% { transform: translate(40px,-30px) scale(1.1); }
+  }
+
+  /* All real content sits above background */
+  .layer { position: relative; z-index: 1; }
+
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ====== Cards & controls ====== */
+  .drop-zone {
+    border: 2px dashed #2a2a38;
+    border-radius: 16px;
+    transition: all 0.3s;
+    cursor: pointer;
+    background: rgba(17,17,24,0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .drop-zone:hover {
+    border-color: #d4943a;
+    background: rgba(212,148,58,0.04);
+    box-shadow: 0 0 40px rgba(212,148,58,0.08);
+  }
+  .drop-zone.dragging {
+    border-color: #f0b960;
+    background: rgba(212,148,58,0.08);
+    transform: scale(1.01);
+  }
+
+  .resize-card {
+    background: rgba(17,17,24,0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid #23232e;
+    border-radius: 14px;
+    padding: 18px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .resize-card:hover {
+    border-color: rgba(212,148,58,0.4);
+    transform: translateY(-2px);
+  }
+
+  .size-input {
+    background: #0e0e14;
+    border: 1px solid #23232e;
+    border-radius: 8px;
+    padding: 9px;
+    color: #e8e6e3;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    width: 100%;
+    text-align: center;
+    transition: 0.2s;
+  }
+  .size-input:focus { outline: none; border-color: #d4943a; box-shadow: 0 0 0 3px rgba(212,148,58,0.15); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #f0b960, #d4943a);
+    color: #0a0a0f;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 11px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+    font-size: 14px;
+  }
+  .btn-primary:hover {
+    box-shadow: 0 6px 24px rgba(212,148,58,0.35);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    background: rgba(17,17,24,0.6);
+    backdrop-filter: blur(8px);
+    color: #e8e6e3;
+    border: 1px solid #23232e;
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 14px;
+  }
+  .btn-secondary:hover { border-color: #d4943a; color: #f0b960; }
+
+  /* Glowing heading accent */
+  .glow-text {
+    color: #d4943a;
+    text-shadow: 0 0 24px rgba(212,148,58,0.5);
+  }
+
+  /* Centered hero icon pulse */
+  .hero-pulse {
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(212,148,58,0.5); }
+    50%     { box-shadow: 0 0 0 14px rgba(212,148,58,0); }
+  }
+
+  /* Fade-in for cards */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.4s ease both; }
+
+  /* Center the main content vertically & horizontally */
+  .center-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px 32px 16px;
+  }
 </style>
 </head>
 <body>
 
-<div class="max-w-4xl mx-auto w-full flex-grow flex flex-col p-4 md:p-6">
-    <!-- Header -->
-    <header class="flex items-center gap-3 mb-4">
-        <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #f0b960, #d4943a);">
-            <i class="fa-solid fa-screwdriver-wrench text-base" style="color: #0a0a0f;"></i>
-        </div>
-        <div>
-            <h1 class="text-lg font-bold leading-tight">Image Resizer</h1>
-            <p class="text-xs" style="color: #6b6878;">Resize & convert images to PNG locally</p>
-        </div>
-    </header>
+<!-- Galaxy background -->
+<canvas id="galaxyCanvas"></canvas>
+<div class="nebula nebula-1"></div>
+<div class="nebula nebula-2"></div>
+<div class="nebula nebula-3"></div>
 
-    <!-- Hero -->
-    <section class="text-center mb-4">
-        <h2 class="text-2xl md:text-3xl font-black tracking-tight mb-2">
-            Resize images <span style="color: #d4943a;">individually</span>
-        </h2>
-        <p class="text-sm mb-3" style="color: #6b6878;">Drop images, set custom sizes, and download them as PNG.</p>
-        <a href="https://github.com/chris1111/Image-Resizer" target="_blank" class="btn-secondary inline-flex items-center gap-2 text-xs">
-            <i class="fa-brands fa-github"></i> View on Github
-        </a>
-    </section>
-
-    <!-- Drop Zone -->
-    <div id="dropZone" class="drop-zone p-6 text-center mb-4">
-        <i class="fa-solid fa-cloud-arrow-up text-xl mb-2" style="color: #d4943a;"></i>
-        <p class="font-bold text-base mb-1">Drop your images here</p>
-        <p class="text-xs mb-3" style="color: #6b6878;">or click to browse — PNG, JPEG, WebP supported</p>
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md" style="background: rgba(212,148,58,0.08); border: 1px solid rgba(212,148,58,0.15);">
-            <span class="text-xs font-bold mono" style="color: #f0b960;">OUTPUT FORMAT: PNG</span>
-        </div>
+<div class="layer flex flex-col min-h-screen w-full">
+  
+  <!-- Header (Upper Left) -->
+  <header class="p-6 md:p-8 self-start flex items-center gap-3">
+    <div class="w-11 h-11 rounded-lg flex items-center justify-center hero-pulse" style="background: linear-gradient(135deg, #f0b960, #d4943a);">
+      <i class="fa-solid fa-screwdriver-wrench text-base" style="color: #0a0a0f;"></i>
     </div>
-    <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp" multiple class="hidden">
+    <div>
+      <h1 class="text-lg font-bold leading-tight">Image Resizer</h1>
+      <p class="text-xs" style="color: #8a8696;">Resize &amp; convert images to PNG — locally, under the stars</p>
+    </div>
+  </header>
 
-    <!-- Controls -->
-    <div id="controls" class="text-center mb-4 hidden">
+  <!-- Centered Content -->
+  <div class="center-wrap">
+    <div class="max-w-4xl w-full">
+
+      <!-- Hero -->
+      <section class="text-center mb-6">
+        <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-3">
+          Resize images <span class="glow-text">individually</span>
+        </h2>
+        <p class="text-sm mb-4 max-w-md mx-auto" style="color: #8a8696;">
+          Drop images, set custom sizes, and download them as PNG.
+        </p>
+        <a href="https://github.com/chris1111/Image-Resizer" target="_blank" class="btn-secondary inline-flex items-center gap-2 text-xs">
+          <i class="fa-brands fa-github"></i> View on Github
+        </a>
+      </section>
+
+      <!-- Drop Zone -->
+      <div id="dropZone" class="drop-zone p-8 text-center mb-5">
+        <i class="fa-solid fa-cloud-arrow-up text-2xl mb-3 block" style="color: #d4943a;"></i>
+        <p class="font-bold text-base mb-1">Drop your images here</p>
+        <p class="text-xs mb-4" style="color: #8a8696;">or click to browse — PNG, JPEG, WebP supported</p>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md" style="background: rgba(212,148,58,0.08); border: 1px solid rgba(212,148,58,0.2);">
+          <span class="text-xs font-bold mono" style="color: #f0b960;">OUTPUT FORMAT: PNG</span>
+        </div>
+      </div>
+      <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp" multiple class="hidden">
+
+      <!-- Controls -->
+      <div id="controls" class="text-center mb-4 hidden">
         <p class="text-sm font-semibold mb-2"><span id="imgCount">0</span> Images Loaded</p>
         <button id="clearBtn" class="btn-secondary text-xs">
-            <i class="fa-solid fa-xmark mr-1"></i> Clear All
+          <i class="fa-solid fa-xmark mr-1"></i> Clear All
         </button>
-    </div>
+      </div>
 
-    <!-- Grid -->
-    <div id="resizeGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4"></div>
+      <!-- Grid -->
+      <div id="resizeGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6"></div>
 
-    <!-- Pushes remaining elements to the bottom -->
-    <div class="flex-grow"></div>
-
-    <!-- How it works -->
-    <section class="mb-4">
-        <div class="rounded-xl p-4" style="background: #111118; border: 1px solid #23232e;">
-            <h3 class="text-sm font-bold mb-3 flex items-center gap-2">
-                <i class="fa-solid fa-microchip text-xs" style="color: #d4943a;"></i>
-                How this works
-            </h3>
-            <div class="grid md:grid-cols-3 gap-4 text-xs" style="color: #6b6878;">
-                <div>
-                    <p class="font-semibold mb-1" style="color: #e8e6e3;">Individual Control</p>
-                    <p>Each image gets its own card. Set completely different dimensions for every image.</p>
-                </div>
-                <div>
-                    <p class="font-semibold mb-1" style="color: #e8e6e3;">Aspect Ratio Lock</p>
-                    <p>Change the width, and the height auto-updates to maintain the original shape.</p>
-                </div>
-                <div>
-                    <p class="font-semibold mb-1" style="color: #e8e6e3;">100% Private</p>
-                    <p>Like the macOS <span class="mono" style="color: #f0b960;">sips</span> command, all rendering is local.</p>
-                </div>
+      <!-- How it works -->
+      <section class="mb-6">
+        <div class="rounded-xl p-5" style="background: rgba(17,17,24,0.55); backdrop-filter: blur(10px); border: 1px solid #23232e;">
+          <h3 class="text-sm font-bold mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-microchip text-xs" style="color: #d4943a;"></i>
+            How this works
+          </h3>
+          <div class="grid md:grid-cols-3 gap-5 text-xs" style="color: #8a8696;">
+            <div>
+              <p class="font-semibold mb-1" style="color: #e8e6e3;">Individual Control</p>
+              <p>Each image gets its own card. Set completely different dimensions for every image.</p>
             </div>
+            <div>
+              <p class="font-semibold mb-1" style="color: #e8e6e3;">Aspect Ratio Lock</p>
+              <p>Change the width, and the height auto-updates to maintain the original shape.</p>
+            </div>
+            <div>
+              <p class="font-semibold mb-1" style="color: #e8e6e3;">100% Private</p>
+              <p>Like the macOS <span class="mono" style="color: #f0b960;">sips</span> command, all rendering is local.</p>
+            </div>
+          </div>
         </div>
-    </section>
+      </section>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center p-4" style="color: #6b6878;">
+    <p class="text-xs mb-1">All processing happens locally in your browser. No data is uploaded.</p>
+    <p class="text-xs">Copyright © 2026 chris1111, All Right Reserved.</p>
+  </footer>
 </div>
 
-<!-- Footer -->
-<footer class="text-center p-4" style="color: #6b6878;">
-    <p class="text-xs mb-1">All processing happens locally in your browser. No data is uploaded.</p>
-    <p class="text-xs">Copyright © 2025 chris1111, All Right Reserved.</p>
-</footer>
-
-<div id="toast" class="fixed top-4 right-4 hidden bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm"></div>
+<div id="toast" class="fixed top-4 right-4 hidden px-4 py-2 rounded-lg shadow-lg z-50 text-sm"></div>
 
 <script>
+/* ============================================================
+   GALAXY BACKGROUND — twinkling stars + shooting stars
+   ============================================================ */
+const canvas = document.getElementById('galaxyCanvas');
+const ctx = canvas.getContext('2d');
+let stars = [];
+let shootingStars = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  initStars();
+}
+
+function initStars() {
+  stars = [];
+  // Star density proportional to screen area
+  const count = Math.floor((canvas.width * canvas.height) / 4000);
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.4 + 0.2,
+      // twinkle speed
+      tw: Math.random() * 0.02 + 0.005,
+      phase: Math.random() * Math.PI * 2,
+      // some stars get a warm tint
+      hue: Math.random() > 0.85 ? 38 : (Math.random() > 0.5 ? 220 : 0),
+      sat: Math.random() > 0.7 ? 60 : 0
+    });
+  }
+}
+
+function spawnShootingStar() {
+  shootingStars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height * 0.5,
+    len: Math.random() * 120 + 80,
+    speed: Math.random() * 6 + 6,
+    angle: Math.PI / 4,
+    life: 1
+  });
+}
+
+function drawGalaxy() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Stars
+  for (const s of stars) {
+    s.phase += s.tw;
+    const alpha = 0.4 + Math.abs(Math.sin(s.phase)) * 0.6;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    if (s.sat > 0) {
+      ctx.fillStyle = `hsla(${s.hue}, ${s.sat}%, 75%, ${alpha})`;
+    } else {
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+    }
+    ctx.fill();
+  }
+
+  // Shooting stars
+  for (let i = shootingStars.length - 1; i >= 0; i--) {
+    const sh = shootingStars[i];
+    const dx = Math.cos(sh.angle) * sh.speed;
+    const dy = Math.sin(sh.angle) * sh.speed;
+    sh.x += dx;
+    sh.y += dy;
+    sh.life -= 0.012;
+
+    const tailX = sh.x - Math.cos(sh.angle) * sh.len;
+    const tailY = sh.y - Math.sin(sh.angle) * sh.len;
+    const grad = ctx.createLinearGradient(sh.x, sh.y, tailX, tailY);
+    grad.addColorStop(0, `rgba(255,230,180,${Math.max(0, sh.life)})`);
+    grad.addColorStop(1, 'rgba(255,230,180,0)');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(sh.x, sh.y);
+    ctx.lineTo(tailX, tailY);
+    ctx.stroke();
+
+    if (sh.life <= 0 || sh.x > canvas.width + 100 || sh.y > canvas.height + 100) {
+      shootingStars.splice(i, 1);
+    }
+  }
+
+  // Occasionally spawn a shooting star
+  if (Math.random() < 0.004) spawnShootingStar();
+
+  requestAnimationFrame(drawGalaxy);
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+drawGalaxy();
+
+/* ============================================================
+   IMAGE RESIZER LOGIC (preserved + aspect-ratio lock added)
+   ============================================================ */
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
 const resizeGrid = document.getElementById('resizeGrid');
@@ -116,105 +380,150 @@ const toast = document.getElementById('toast');
 let images = [];
 
 function showToast(msg, isErr = false) {
-    toast.textContent = msg;
-    toast.className = `fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 text-sm ${isErr ? 'bg-red-500' : 'bg-green-500'} text-white`;
-    setTimeout(() => toast.classList.add('hidden'), 3000);
+  toast.textContent = msg;
+  toast.className = `fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 text-sm text-white ${isErr ? 'bg-red-500' : 'bg-green-500'}`;
+  toast.classList.remove('hidden');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.add('hidden'), 2800);
 }
 
 dropZone.addEventListener('click', () => fileInput.click());
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = '#d4943a'; });
-dropZone.addEventListener('dragleave', () => dropZone.style.borderColor = '#23232e');
-dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.style.borderColor = '#23232e'; handleFiles(e.dataTransfer.files); });
+dropZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropZone.classList.add('dragging');
+});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragging'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('dragging');
+  handleFiles(e.dataTransfer.files);
+});
 fileInput.addEventListener('change', e => handleFiles(e.target.files));
 clearBtn.addEventListener('click', clearAll);
 
 function handleFiles(files) {
-    const valid = Array.from(files).filter(f => ['image/png', 'image/jpeg', 'image/webp'].includes(f.type));
-    if (valid.length === 0) return showToast('Please select valid PNG, JPEG, or WebP files.', true);
-    
-    valid.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = e => {
-            const img = new Image();
-            img.onload = () => {
-                images.push({ img, file, name: file.name, w: img.naturalWidth, h: img.naturalHeight });
-                renderGrid();
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    });
+  const valid = Array.from(files).filter(f => ['image/png', 'image/jpeg', 'image/webp'].includes(f.type));
+  if (valid.length === 0) return showToast('Please select valid PNG, JPEG, or WebP files.', true);
+
+  valid.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        images.push({ img, file, name: file.name, w: img.naturalWidth, h: img.naturalHeight });
+        renderGrid();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 function renderGrid() {
-    const isEmpty = images.length === 0;
-    controls.classList.toggle('hidden', isEmpty);
-    imgCount.textContent = images.length;
-    resizeGrid.innerHTML = '';
-    
-    images.forEach((item, i) => {
-        const card = document.createElement('div');
-        card.className = 'resize-card';
-        card.innerHTML = `
-            <div class="flex items-center gap-3 mb-3">
-                <img src="${item.img.src}" class="w-10 h-10 object-cover rounded-md">
-                <div class="flex-1 overflow-hidden">
-                    <p class="font-bold text-sm truncate">${item.name}</p>
-                    <p class="text-xs mono" style="color: #6b6878;">Original: ${item.w} x ${item.h}</p>
-                </div>
-            </div>
-            <div class="grid grid-cols-2 gap-3 mb-3">
-                <div>
-                    <label class="text-xs mono block mb-1" style="color: #6b6878;">WIDTH (px)</label>
-                    <input type="number" class="size-input w-input" value="${item.w}" min="1">
-                </div>
-                <div>
-                    <label class="text-xs mono block mb-1" style="color: #6b6878;">HEIGHT (px)</label>
-                    <input type="number" class="size-input h-input" value="${item.h}" min="1">
-                </div>
-            </div>
-            <button class="btn-primary resize-btn" data-index="${i}">
-                <i class="fa-solid fa-download mr-2"></i> Resize & Download (PNG)
-            </button>
-        `;
-        resizeGrid.appendChild(card);
-    });
+  const isEmpty = images.length === 0;
+  controls.classList.toggle('hidden', isEmpty);
+  imgCount.textContent = images.length;
+  resizeGrid.innerHTML = '';
 
-    document.querySelectorAll('.resize-btn').forEach(btn => {
-        btn.addEventListener('click', e => resizeImage(parseInt(e.currentTarget.dataset.index)));
+  images.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'resize-card fade-up';
+    card.innerHTML = `
+      <div class="flex items-center gap-3 mb-3">
+        <img src="${item.img.src}" class="w-11 h-11 object-cover rounded-md" style="border:1px solid #23232e;">
+        <div class="flex-1 overflow-hidden">
+          <p class="font-bold text-sm truncate">${item.name}</p>
+          <p class="text-xs mono" style="color: #8a8696;">Original: ${item.w} × ${item.h}</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-xs mono block mb-1" style="color: #8a8696;">WIDTH (px)</label>
+          <input type="number" class="size-input w-input" value="${item.w}" min="1">
+        </div>
+        <div>
+          <label class="text-xs mono block mb-1" style="color: #8a8696;">HEIGHT (px)</label>
+          <input type="number" class="size-input h-input" value="${item.h}" min="1">
+        </div>
+      </div>
+      <div class="flex items-center justify-between mb-3 text-xs" style="color:#8a8696;">
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" class="aspect-lock" checked style="accent-color:#d4943a;">
+          <span>Lock aspect ratio</span>
+        </label>
+        <button class="reset-btn text-xs hover:text-amber-400 transition" style="color:#8a8696;" data-index="${i}">
+          <i class="fa-solid fa-rotate-left mr-1"></i>Reset
+        </button>
+      </div>
+      <button class="btn-primary resize-btn" data-index="${i}">
+        <i class="fa-solid fa-download mr-2"></i> Resize &amp; Download (PNG)
+      </button>
+    `;
+    resizeGrid.appendChild(card);
+
+    // Aspect-ratio locking
+    const wInput = card.querySelector('.w-input');
+    const hInput = card.querySelector('.h-input');
+    const lock   = card.querySelector('.aspect-lock');
+    const ratio  = item.w / item.h;
+
+    wInput.addEventListener('input', () => {
+      if (lock.checked) {
+        const v = parseInt(wInput.value);
+        if (v > 0) hInput.value = Math.round(v / ratio);
+      }
     });
+    hInput.addEventListener('input', () => {
+      if (lock.checked) {
+        const v = parseInt(hInput.value);
+        if (v > 0) wInput.value = Math.round(v * ratio);
+      }
+    });
+  });
+
+  document.querySelectorAll('.resize-btn').forEach(btn => {
+    btn.addEventListener('click', e => resizeImage(parseInt(e.currentTarget.dataset.index)));
+  });
+  document.querySelectorAll('.reset-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const i = parseInt(e.currentTarget.dataset.index);
+      const card = resizeGrid.children[i];
+      card.querySelector('.w-input').value = images[i].w;
+      card.querySelector('.h-input').value = images[i].h;
+    });
+  });
 }
 
 function resizeImage(index) {
-    const item = images[index];
-    const card = resizeGrid.children[index];
-    const w = parseInt(card.querySelector('.w-input').value);
-    const h = parseInt(card.querySelector('.h-input').value);
-    
-    if (!w || !h || w <= 0 || h <= 0) return showToast('Invalid dimensions.', true);
+  const item = images[index];
+  const card = resizeGrid.children[index];
+  const w = parseInt(card.querySelector('.w-input').value);
+  const h = parseInt(card.querySelector('.h-input').value);
 
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(item.img, 0, 0, w, h);
+  if (!w || !h || w <= 0 || h <= 0) return showToast('Invalid dimensions.', true);
 
-    canvas.toBlob(blob => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${item.name.split('.').slice(0, -1).join('.')}-${w}x${h}.png`;
-        a.click();
-        URL.revokeObjectURL(url);
-        showToast('Downloaded successfully!');
-    }, 'image/png');
+  const cv = document.createElement('canvas');
+  cv.width = w;
+  cv.height = h;
+  const cctx = cv.getContext('2d');
+  cctx.imageSmoothingEnabled = true;
+  cctx.imageSmoothingQuality = 'high';
+  cctx.drawImage(item.img, 0, 0, w, h);
+
+  cv.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${item.name.split('.').slice(0, -1).join('.')}-${w}x${h}.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Downloaded successfully!');
+  }, 'image/png');
 }
 
 function clearAll() {
-    images = [];
-    renderGrid();
+  images = [];
+  renderGrid();
 }
 </script>
 </body>
