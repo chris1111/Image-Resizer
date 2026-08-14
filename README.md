@@ -1,4 +1,9 @@
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://github.com/chris1111/Image-Resizer/blob/main/LICENSE) [![pages-build-deployment](https://github.com/chris1111/Image-Resizer/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/chris1111/Image-Resizer/actions/workflows/pages/pages-build-deployment)
+
 # Image Resizer
+
+## Start using ➢ [Image-Resizer](https://chris1111.github.io/Image-Resizer/)
+
 
 1. Local & Private (Browser-side)
 Everything happens directly inside your web browser using the HTML5 Canvas API. Just like the macOS sips command runs in your terminal, this tool runs in your browser engine. No images are ever uploaded to a server, ensuring 100% privacy.
