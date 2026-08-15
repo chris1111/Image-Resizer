@@ -31,19 +31,22 @@ When you click "Resize & Download" on a specific card:
 5. Instant Download
 The newly resized image is packaged into a downloadable file automatically. The new file is named with its new dimensions (e.g., myimage-800x600.png) and saved straight to your Downloads folder.
 
-### Updated 15 August 2026
+### Updated 15 Aug 2026
 
 ✨ New Visual Effects (On Image Upload)
+
 	1	Horizontal Shooting Star: A bright, skewed light streak now sweeps across the entire width of each image card when it uploads.
 	2	Particle Burst: A JavaScript-generated explosion of 14 glowing golden sparks shoots outward from the center of the card.
 	3	Expanding Ring & Flash: A glowing border ring expands and fades, paired with a quick radial flash of light (using mix-blend-mode: screen) to simulate a cosmic "spawn."
 	4	Upgraded Card Entrance: Replaced the simple fade-up with a smoother animation that includes a slight scale-up and a brightness flash.
 
 ⚙️ Logic & Performance Fixes
+
 	5	Fixed Multiple Uploads: Originally, the code rebuilt the entire grid every time a new image loaded, which erased the animation of the first images if you uploaded 10 at once. We changed this to append new cards directly to the bottom, ensuring every single image gets to play its full animation.
 	6	Smart Z-Indexing: Carefully layered the shooting star and flashes in front of the card content, but behind the inputs and buttons, so the UI remains fully clickable while the magic happens on top.
 
 🗑️ New UI Features
+
 	7	Individual Remove Button: Added a small X button to the top-right corner of every card.
 	8	Smooth Removal Animation: Clicking the remove button triggers a smooth fade-out and scale-down before deleting the card from the DOM.
 	9	Dynamic Counter & Auto-Hide: Created an updateCounter() function that instantly updates the "Images Loaded" text when you delete an image, and automatically hides the "Clear All" bar when the list reaches zero.
