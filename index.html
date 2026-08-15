@@ -21,155 +21,186 @@
   }
 
   /* ====== Galaxy background layers ====== */
-  #galaxyCanvas {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-  }
+  #galaxyCanvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
   .nebula {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.45;
-    pointer-events: none;
-    z-index: 0;
+    position: fixed; border-radius: 50%; filter: blur(80px);
+    opacity: 0.45; pointer-events: none; z-index: 0;
     animation: drift 30s ease-in-out infinite alternate;
   }
-  .nebula-1 {
-    width: 520px; height: 520px;
-    top: -120px; left: -100px;
-    background: radial-gradient(circle, rgba(212,148,58,0.55), transparent 65%);
-  }
-  .nebula-2 {
-    width: 600px; height: 600px;
-    bottom: -180px; right: -120px;
-    background: radial-gradient(circle, rgba(120,80,200,0.45), transparent 65%);
-    animation-delay: -10s;
-  }
-  .nebula-3 {
-    width: 440px; height: 440px;
-    top: 40%; left: 55%;
-    background: radial-gradient(circle, rgba(60,130,220,0.35), transparent 65%);
-    animation-delay: -18s;
-  }
+  .nebula-1 { width: 520px; height: 520px; top: -120px; left: -100px;
+    background: radial-gradient(circle, rgba(212,148,58,0.55), transparent 65%); }
+  .nebula-2 { width: 600px; height: 600px; bottom: -180px; right: -120px;
+    background: radial-gradient(circle, rgba(120,80,200,0.45), transparent 65%); animation-delay: -10s; }
+  .nebula-3 { width: 440px; height: 440px; top: 40%; left: 55%;
+    background: radial-gradient(circle, rgba(60,130,220,0.35), transparent 65%); animation-delay: -18s; }
   @keyframes drift {
     0%   { transform: translate(0,0) scale(1); }
     100% { transform: translate(40px,-30px) scale(1.1); }
   }
 
-  /* All real content sits above background */
   .layer { position: relative; z-index: 1; }
-
   .mono { font-family: 'JetBrains Mono', monospace; }
 
   /* ====== Cards & controls ====== */
   .drop-zone {
-    border: 2px dashed #2a2a38;
-    border-radius: 16px;
-    transition: all 0.3s;
-    cursor: pointer;
-    background: rgba(17,17,24,0.55);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    border: 2px dashed #2a2a38; border-radius: 16px; transition: all 0.3s;
+    cursor: pointer; background: rgba(17,17,24,0.55);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   }
   .drop-zone:hover {
-    border-color: #d4943a;
-    background: rgba(212,148,58,0.04);
+    border-color: #d4943a; background: rgba(212,148,58,0.04);
     box-shadow: 0 0 40px rgba(212,148,58,0.08);
   }
   .drop-zone.dragging {
-    border-color: #f0b960;
-    background: rgba(212,148,58,0.08);
-    transform: scale(1.01);
+    border-color: #f0b960; background: rgba(212,148,58,0.08); transform: scale(1.01);
   }
 
   .resize-card {
     background: rgba(17,17,24,0.65);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid #23232e;
-    border-radius: 14px;
-    padding: 18px;
-    transition: border-color 0.3s, transform 0.3s;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid #23232e; border-radius: 14px; padding: 18px;
+    transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s, opacity 0.3s;
+    position: relative; overflow: hidden;
   }
   .resize-card:hover {
-    border-color: rgba(212,148,58,0.4);
-    transform: translateY(-2px);
+    border-color: rgba(212,148,58,0.4); transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
   }
 
-  .size-input {
-    background: #0e0e14;
-    border: 1px solid #23232e;
-    border-radius: 8px;
-    padding: 9px;
-    color: #e8e6e3;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 15px;
-    width: 100%;
-    text-align: center;
+  /* === Remove Button === */
+  .remove-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #2a2a38;
+    color: #8a8696;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
     transition: 0.2s;
+    z-index: 30; /* Keep above effect layers */
+  }
+  .remove-btn:hover {
+    background: rgba(220, 50, 50, 0.15);
+    border-color: rgba(220, 50, 50, 0.5);
+    color: #ff8a8a;
+  }
+
+  /* === Horizontal Shooting Star across the whole card === */
+  .shoot-h {
+    position: absolute; left: -60%; top: 0; width: 60%; height: 200%;
+    transform: skewX(-20deg); z-index: 20; pointer-events: none; opacity: 0;
+    background: linear-gradient(90deg,
+      rgba(255,255,255,0) 0%,
+      rgba(240,185,96,0) 20%,
+      rgba(255,230,180,0.95) 60%,
+      #ffffff 80%,
+      rgba(255,255,255,0) 100%);
+    box-shadow: 0 0 15px rgba(240,185,96,0.9), 0 0 30px rgba(240,185,96,0.5);
+    filter: blur(1px);
+  }
+  .resize-card.entering .shoot-h {
+    animation: shootAcrossCard 1.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    animation-delay: 0.3s;
+  }
+  @keyframes shootAcrossCard {
+    0%   { left: -60%; opacity: 0; }
+    15%  { opacity: 1; }
+    100% { left: 120%; opacity: 0; }
+  }
+
+  /* === Upload Effect Elements === */
+  .card-flash {
+    position: absolute; inset: 0; z-index: 15; pointer-events: none; opacity: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.8), rgba(240,185,96,0.4) 40%, transparent 70%);
+    mix-blend-mode: screen;
+  }
+  .resize-card.entering .card-flash { animation: cardFlash 0.8s ease-out forwards; }
+  @keyframes cardFlash {
+    0%   { opacity: 0; transform: scale(0.5); }
+    30%  { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.5); }
+  }
+
+  .card-ring {
+    position: absolute; inset: 0; border-radius: 14px;
+    border: 2px solid rgba(240,185,96,0.8);
+    z-index: 10; pointer-events: none; opacity: 0;
+  }
+  .resize-card.entering .card-ring { animation: ringExpand 1.2s ease-out forwards; }
+  @keyframes ringExpand {
+    0%   { opacity: 1; transform: scale(0.9); }
+    100% { opacity: 0; transform: scale(1.1); }
+  }
+
+  .burst {
+    position: absolute; left: 50%; top: 50%;
+    width: 0; height: 0; z-index: 25; pointer-events: none;
+  }
+  .burst span {
+    position: absolute; left: 0; top: 0;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #f0b960;
+    box-shadow: 0 0 8px #f0b960, 0 0 16px rgba(240,185,96,0.6);
+    opacity: 0;
+  }
+  .resize-card.entering .burst span {
+    animation: spark var(--dur, 1s) cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
+    animation-delay: var(--delay, 0s);
+  }
+  @keyframes spark {
+    0%   { transform: translate(-50%, -50%) translate(0,0) scale(0); opacity: 0; }
+    20%  { opacity: 1; transform: translate(-50%, -50%) translate(0,0) scale(1.4); }
+    100% { transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+  }
+
+  /* Card entrance */
+  @keyframes cardEnter {
+    0%   { opacity: 0; transform: translateY(20px) scale(0.92); filter: brightness(1.8); }
+    60%  { opacity: 1; transform: translateY(0) scale(1.02); filter: brightness(1.3); }
+    100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); }
+  }
+  .resize-card.entering { animation: cardEnter 0.6s ease both; }
+
+  .size-input {
+    background: #0e0e14; border: 1px solid #23232e; border-radius: 8px;
+    padding: 9px; color: #e8e6e3; font-family: 'JetBrains Mono', monospace;
+    font-size: 15px; width: 100%; text-align: center; transition: 0.2s;
+    position: relative; z-index: 2;
   }
   .size-input:focus { outline: none; border-color: #d4943a; box-shadow: 0 0 0 3px rgba(212,148,58,0.15); }
 
   .btn-primary {
     background: linear-gradient(135deg, #f0b960, #d4943a);
-    color: #0a0a0f;
-    font-weight: 700;
-    border: none;
-    border-radius: 8px;
-    padding: 11px;
-    cursor: pointer;
-    transition: 0.3s;
-    width: 100%;
-    font-size: 14px;
+    color: #0a0a0f; font-weight: 700; border: none; border-radius: 8px;
+    padding: 11px; cursor: pointer; transition: 0.3s; width: 100%; font-size: 14px;
+    position: relative; z-index: 2;
   }
-  .btn-primary:hover {
-    box-shadow: 0 6px 24px rgba(212,148,58,0.35);
-    transform: translateY(-1px);
-  }
+  .btn-primary:hover { box-shadow: 0 6px 24px rgba(212,148,58,0.35); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
 
   .btn-secondary {
-    background: rgba(17,17,24,0.6);
-    backdrop-filter: blur(8px);
-    color: #e8e6e3;
-    border: 1px solid #23232e;
-    border-radius: 8px;
-    padding: 8px 16px;
-    cursor: pointer;
-    transition: 0.3s;
-    font-size: 14px;
+    background: rgba(17,17,24,0.6); backdrop-filter: blur(8px);
+    color: #e8e6e3; border: 1px solid #23232e; border-radius: 8px;
+    padding: 8px 16px; cursor: pointer; transition: 0.3s; font-size: 14px;
   }
   .btn-secondary:hover { border-color: #d4943a; color: #f0b960; }
 
-  /* Glowing heading accent */
-  .glow-text {
-    color: #d4943a;
-    text-shadow: 0 0 24px rgba(212,148,58,0.5);
-  }
+  .glow-text { color: #d4943a; text-shadow: 0 0 24px rgba(212,148,58,0.5); }
 
-  /* Centered hero icon pulse */
-  .hero-pulse {
-    animation: pulse 3s ease-in-out infinite;
-  }
+  .hero-pulse { animation: pulse 3s ease-in-out infinite; }
   @keyframes pulse {
     0%,100% { box-shadow: 0 0 0 0 rgba(212,148,58,0.5); }
     50%     { box-shadow: 0 0 0 14px rgba(212,148,58,0); }
   }
 
-  /* Fade-in for cards */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .fade-up { animation: fadeUp 0.4s ease both; }
-
-  /* Center the main content vertically & horizontally */
   .center-wrap {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    flex: 1; display: flex; align-items: center; justify-content: center;
     padding: 0 16px 32px 16px;
   }
 </style>
@@ -286,17 +317,14 @@ function resizeCanvas() {
 
 function initStars() {
   stars = [];
-  // Star density proportional to screen area
   const count = Math.floor((canvas.width * canvas.height) / 4000);
   for (let i = 0; i < count; i++) {
     stars.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
       r: Math.random() * 1.4 + 0.2,
-      // twinkle speed
       tw: Math.random() * 0.02 + 0.005,
       phase: Math.random() * Math.PI * 2,
-      // some stars get a warm tint
       hue: Math.random() > 0.85 ? 38 : (Math.random() > 0.5 ? 220 : 0),
       sat: Math.random() > 0.7 ? 60 : 0
     });
@@ -317,7 +345,6 @@ function spawnShootingStar() {
 function drawGalaxy() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Stars
   for (const s of stars) {
     s.phase += s.tw;
     const alpha = 0.4 + Math.abs(Math.sin(s.phase)) * 0.6;
@@ -331,7 +358,6 @@ function drawGalaxy() {
     ctx.fill();
   }
 
-  // Shooting stars
   for (let i = shootingStars.length - 1; i >= 0; i--) {
     const sh = shootingStars[i];
     const dx = Math.cos(sh.angle) * sh.speed;
@@ -357,9 +383,7 @@ function drawGalaxy() {
     }
   }
 
-  // Occasionally spawn a shooting star
   if (Math.random() < 0.004) spawnShootingStar();
-
   requestAnimationFrame(drawGalaxy);
 }
 
@@ -368,7 +392,7 @@ resizeCanvas();
 drawGalaxy();
 
 /* ============================================================
-   IMAGE RESIZER LOGIC (preserved + aspect-ratio lock added)
+   IMAGE RESIZER LOGIC
    ============================================================ */
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
@@ -388,10 +412,7 @@ function showToast(msg, isErr = false) {
 }
 
 dropZone.addEventListener('click', () => fileInput.click());
-dropZone.addEventListener('dragover', e => {
-  e.preventDefault();
-  dropZone.classList.add('dragging');
-});
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragging'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragging'));
 dropZone.addEventListener('drop', e => {
   e.preventDefault();
@@ -401,17 +422,31 @@ dropZone.addEventListener('drop', e => {
 fileInput.addEventListener('change', e => handleFiles(e.target.files));
 clearBtn.addEventListener('click', clearAll);
 
+function updateCounter() {
+  imgCount.textContent = images.length;
+  if (images.length === 0) {
+    controls.classList.add('hidden');
+  } else {
+    controls.classList.remove('hidden');
+  }
+}
+
 function handleFiles(files) {
   const valid = Array.from(files).filter(f => ['image/png', 'image/jpeg', 'image/webp'].includes(f.type));
   if (valid.length === 0) return showToast('Please select valid PNG, JPEG, or WebP files.', true);
+
+  controls.classList.remove('hidden');
 
   valid.forEach(file => {
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
       img.onload = () => {
-        images.push({ img, file, name: file.name, w: img.naturalWidth, h: img.naturalHeight });
-        renderGrid();
+        const item = { img, file, name: file.name, w: img.naturalWidth, h: img.naturalHeight };
+        images.push(item);
+        const index = images.length - 1;
+        appendCard(item, index);
+        updateCounter();
       };
       img.src = e.target.result;
     };
@@ -419,84 +454,120 @@ function handleFiles(files) {
   });
 }
 
-function renderGrid() {
-  const isEmpty = images.length === 0;
-  controls.classList.toggle('hidden', isEmpty);
-  imgCount.textContent = images.length;
-  resizeGrid.innerHTML = '';
+/* Build a particle burst element with N sparks flying outward across the whole card */
+function buildBurst(count = 14) {
+  const burst = document.createElement('div');
+  burst.className = 'burst';
+  for (let i = 0; i < count; i++) {
+    const span = document.createElement('span');
+    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+    const dist = 60 + Math.random() * 80;
+    span.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+    span.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
+    span.style.setProperty('--delay', `${Math.random() * 0.15}s`);
+    span.style.setProperty('--dur', `${0.8 + Math.random() * 0.6}s`);
+    const size = 4 + Math.random() * 4;
+    span.style.width = `${size}px`;
+    span.style.height = `${size}px`;
+    burst.appendChild(span);
+  }
+  return burst;
+}
 
-  images.forEach((item, i) => {
-    const card = document.createElement('div');
-    card.className = 'resize-card fade-up';
-    card.innerHTML = `
-      <div class="flex items-center gap-3 mb-3">
-        <img src="${item.img.src}" class="w-11 h-11 object-cover rounded-md" style="border:1px solid #23232e;">
-        <div class="flex-1 overflow-hidden">
-          <p class="font-bold text-sm truncate">${item.name}</p>
-          <p class="text-xs mono" style="color: #8a8696;">Original: ${item.w} × ${item.h}</p>
-        </div>
+function appendCard(item, i) {
+  const card = document.createElement('div');
+  card.className = 'resize-card entering';
+  card.dataset.index = i;
+  card.innerHTML = `
+    <!-- Effect layers -->
+    <div class="card-ring"></div>
+    <div class="card-flash"></div>
+    <div class="shoot-h"></div>
+    
+    <!-- Remove Button -->
+    <button class="remove-btn" title="Remove image">
+      <i class="fa-solid fa-xmark text-xs"></i>
+    </button>
+    
+    <!-- Card Content -->
+    <div class="flex items-center gap-3 mb-3 relative" style="z-index: 2;">
+      <img src="${item.img.src}" class="w-11 h-11 object-cover rounded-md" style="border:1px solid #23232e;">
+      <div class="flex-1 overflow-hidden">
+        <p class="font-bold text-sm truncate">${item.name}</p>
+        <p class="text-xs mono" style="color: #8a8696;">Original: ${item.w} × ${item.h}</p>
       </div>
-      <div class="grid grid-cols-2 gap-3 mb-3">
-        <div>
-          <label class="text-xs mono block mb-1" style="color: #8a8696;">WIDTH (px)</label>
-          <input type="number" class="size-input w-input" value="${item.w}" min="1">
-        </div>
-        <div>
-          <label class="text-xs mono block mb-1" style="color: #8a8696;">HEIGHT (px)</label>
-          <input type="number" class="size-input h-input" value="${item.h}" min="1">
-        </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3 mb-3 relative" style="z-index: 2;">
+      <div>
+        <label class="text-xs mono block mb-1" style="color: #8a8696;">WIDTH (px)</label>
+        <input type="number" class="size-input w-input" value="${item.w}" min="1">
       </div>
-      <div class="flex items-center justify-between mb-3 text-xs" style="color:#8a8696;">
-        <label class="flex items-center gap-2 cursor-pointer select-none">
-          <input type="checkbox" class="aspect-lock" checked style="accent-color:#d4943a;">
-          <span>Lock aspect ratio</span>
-        </label>
-        <button class="reset-btn text-xs hover:text-amber-400 transition" style="color:#8a8696;" data-index="${i}">
-          <i class="fa-solid fa-rotate-left mr-1"></i>Reset
-        </button>
+      <div>
+        <label class="text-xs mono block mb-1" style="color: #8a8696;">HEIGHT (px)</label>
+        <input type="number" class="size-input h-input" value="${item.h}" min="1">
       </div>
-      <button class="btn-primary resize-btn" data-index="${i}">
-        <i class="fa-solid fa-download mr-2"></i> Resize &amp; Download (PNG)
+    </div>
+    <div class="flex items-center justify-between mb-3 text-xs relative" style="color:#8a8696; z-index: 2;">
+      <label class="flex items-center gap-2 cursor-pointer select-none">
+        <input type="checkbox" class="aspect-lock" checked style="accent-color:#d4943a;">
+        <span>Lock aspect ratio</span>
+      </label>
+      <button class="reset-btn text-xs hover:text-amber-400 transition" style="color:#8a8696;">
+        <i class="fa-solid fa-rotate-left mr-1"></i>Reset
       </button>
-    `;
-    resizeGrid.appendChild(card);
+    </div>
+    <button class="btn-primary resize-btn">
+      <i class="fa-solid fa-download mr-2"></i> Resize &amp; Download (PNG)
+    </button>
+  `;
 
-    // Aspect-ratio locking
-    const wInput = card.querySelector('.w-input');
-    const hInput = card.querySelector('.h-input');
-    const lock   = card.querySelector('.aspect-lock');
-    const ratio  = item.w / item.h;
+  card.appendChild(buildBurst(14));
+  resizeGrid.appendChild(card);
 
-    wInput.addEventListener('input', () => {
-      if (lock.checked) {
-        const v = parseInt(wInput.value);
-        if (v > 0) hInput.value = Math.round(v / ratio);
-      }
-    });
-    hInput.addEventListener('input', () => {
-      if (lock.checked) {
-        const v = parseInt(hInput.value);
-        if (v > 0) wInput.value = Math.round(v * ratio);
-      }
-    });
+  void card.offsetWidth; // Force reflow so animation restarts reliably
+  setTimeout(() => card.classList.remove('entering'), 1800);
+
+  const wInput = card.querySelector('.w-input');
+  const hInput = card.querySelector('.h-input');
+  const lock   = card.querySelector('.aspect-lock');
+  const ratio  = item.w / item.h;
+
+  wInput.addEventListener('input', () => {
+    if (lock.checked) {
+      const v = parseInt(wInput.value);
+      if (v > 0) hInput.value = Math.round(v / ratio);
+    }
+  });
+  hInput.addEventListener('input', () => {
+    if (lock.checked) {
+      const v = parseInt(hInput.value);
+      if (v > 0) wInput.value = Math.round(v * ratio);
+    }
   });
 
-  document.querySelectorAll('.resize-btn').forEach(btn => {
-    btn.addEventListener('click', e => resizeImage(parseInt(e.currentTarget.dataset.index)));
+  card.querySelector('.resize-btn').addEventListener('click', () => resizeImage(item, card));
+  card.querySelector('.reset-btn').addEventListener('click', () => {
+    wInput.value = item.w;
+    hInput.value = item.h;
   });
-  document.querySelectorAll('.reset-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      const i = parseInt(e.currentTarget.dataset.index);
-      const card = resizeGrid.children[i];
-      card.querySelector('.w-input').value = images[i].w;
-      card.querySelector('.h-input').value = images[i].h;
-    });
+  
+  card.querySelector('.remove-btn').addEventListener('click', () => {
+    // Smooth fade out
+    card.style.opacity = '0';
+    card.style.transform = 'scale(0.9) translateY(-10px)';
+    
+    setTimeout(() => {
+      const index = images.indexOf(item);
+      if (index > -1) {
+        images.splice(index, 1);
+      }
+      card.remove();
+      updateCounter();
+    }, 300);
   });
 }
 
-function resizeImage(index) {
-  const item = images[index];
-  const card = resizeGrid.children[index];
+function resizeImage(item, card) {
   const w = parseInt(card.querySelector('.w-input').value);
   const h = parseInt(card.querySelector('.h-input').value);
 
@@ -523,7 +594,8 @@ function resizeImage(index) {
 
 function clearAll() {
   images = [];
-  renderGrid();
+  resizeGrid.innerHTML = '';
+  updateCounter();
 }
 </script>
 </body>
