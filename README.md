@@ -29,7 +29,7 @@ When you click "Resize & Download" on a specific card:
 The newly resized image is packaged into a downloadable file automatically. The new file is named with its new dimensions (e.g., myimage-800x600.png) and saved straight to your Downloads folder.
 
 ### Combined with this tools ➥ [Icon-Studio](https://chris1111.github.io/Icon-Studio/) ➥ [Workshop Layered Image-Studio](https://github.com/chris1111/Workshop-Layered-Image-Studio) 
-they are the perfect tools for creating themes icons for OpenCore or Clover.
+A free easy way for those who have virtually no knowledge of graphic design. they are the perfect tools for creating themes icons sets for OpenCore or Clover.
 
 ## List Update: ⬇︎
 <details> 
