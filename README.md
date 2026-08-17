@@ -4,7 +4,7 @@
 
 ## Start using ➢ [Image-Resizer](https://chris1111.github.io/Image-Resizer/)
 
-### Combined with this tools ➥ [Icon-Studio](https://chris1111.github.io/Icon-Studio/) 
+### Combined with this tools ➥ [Icon-Studio](https://chris1111.github.io/Icon-Studio/) ➥ [Workshop Layered Image-Studio](https://github.com/chris1111/Workshop-Layered-Image-Studio) 
 they are the perfect tools for creating themes icons for OpenCore or Clover.
 
 ----------------------------------------------------------------------------
