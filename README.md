@@ -4,9 +4,6 @@
 
 ## Start using ➢ [Image-Resizer](https://chris1111.github.io/Image-Resizer/)
 
-### Combined with this tools ➥ [Icon-Studio](https://chris1111.github.io/Icon-Studio/) ➥ [Workshop Layered Image-Studio](https://github.com/chris1111/Workshop-Layered-Image-Studio) 
-they are the perfect tools for creating themes icons for OpenCore or Clover.
-
 ----------------------------------------------------------------------------
 
 ### How it work
@@ -31,6 +28,13 @@ When you click "Resize & Download" on a specific card:
 5. Instant Download
 The newly resized image is packaged into a downloadable file automatically. The new file is named with its new dimensions (e.g., myimage-800x600.png) and saved straight to your Downloads folder.
 
+### Combined with this tools ➥ [Icon-Studio](https://chris1111.github.io/Icon-Studio/) ➥ [Workshop Layered Image-Studio](https://github.com/chris1111/Workshop-Layered-Image-Studio) 
+they are the perfect tools for creating themes icons for OpenCore or Clover.
+
+## List Update: ⬇︎
+<details> 
+  <summary>View Update</summary>
+	
 ### Updated 15 Aug 2026
 
 ✨ New Visual Effects (On Image Upload)
@@ -50,5 +54,9 @@ The newly resized image is packaged into a downloadable file automatically. The 
 	7	Individual Remove Button: Added a small X button to the top-right corner of every card.
 	8	Smooth Removal Animation: Clicking the remove button triggers a smooth fade-out and scale-down before deleting the card from the DOM.
 	9	Dynamic Counter & Auto-Hide: Created an updateCounter() function that instantly updates the "Images Loaded" text when you delete an image, and automatically hides the "Clear All" bar when the list reaches zero.
+
+</details>
+
+	
 
 
